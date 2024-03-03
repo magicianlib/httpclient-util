@@ -1,6 +1,6 @@
 package io.magicianlib.method;
 
-import io.magicianlib.CustomRequestConfig;
+import io.magicianlib.RequestConfig;
 import io.magicianlib.HttpException;
 import io.magicianlib.parameter.QueryParameter;
 import okhttp3.Call;
@@ -18,7 +18,7 @@ import java.util.function.Function;
 public final class GET {
     private static final Logger LOGGER = LoggerFactory.getLogger(GET.class);
 
-    public static String get(String url, QueryParameter parameter, CustomRequestConfig config) {
+    public static String get(String url, QueryParameter parameter, RequestConfig config) {
         return doGet(url, parameter, config, body -> {
             try {
                 return body.string();
@@ -28,7 +28,7 @@ public final class GET {
         });
     }
 
-    public static byte[] getFile(String url, QueryParameter parameter, CustomRequestConfig config) {
+    public static byte[] getFile(String url, QueryParameter parameter, RequestConfig config) {
         return doGet(url, parameter, config, body -> {
             try {
                 return body.bytes();
@@ -38,7 +38,7 @@ public final class GET {
         });
     }
 
-    public static String download(String url, QueryParameter parameter, CustomRequestConfig config) {
+    public static String download(String url, QueryParameter parameter, RequestConfig config) {
 
         String filename;
         try {
@@ -64,12 +64,11 @@ public final class GET {
         return filename;
     }
 
-    public static <R> R doGet(String url, QueryParameter parameter, CustomRequestConfig config, Function<ResponseBody, R> function) {
+    public static <R> R doGet(String url, QueryParameter parameter, RequestConfig config, Function<ResponseBody, R> function) {
         Request request = new Request.Builder()
                 .headers(config.toHeaders())
-                .header("Proxy", config.getProxy())
                 .url(parameter.toUrl(url))
-                .tag(CustomRequestConfig.class, config)
+                .tag(RequestConfig.class, config)
                 .get()
                 .build();
 
@@ -77,7 +76,7 @@ public final class GET {
             LOGGER.info("Http {}", request);
         }
 
-        Call call = Client.call(request);
+        Call call = Client.call(request, config.getProxy());
         try (Response response = call.execute()) {
             if (response.isSuccessful()) {
                 ResponseBody body = response.body();

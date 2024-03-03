@@ -5,7 +5,12 @@ import okhttp3.Headers;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CustomRequestConfig {
+/**
+ * 自定义HTTP请求配置
+ *
+ * @author magicianlib@gmail.com
+ */
+public class RequestConfig {
     /**
      * 是否打印请求日志
      */
@@ -29,7 +34,11 @@ public class CustomRequestConfig {
     /**
      * 失败重试次数
      */
-    private int maxRetry;
+    private int retry;
+    /**
+     * 连接超时
+     */
+    private int connectTimeout = 3_000;
     /**
      * 从服务器读取数据的超时时间
      */
@@ -38,7 +47,9 @@ public class CustomRequestConfig {
      * 向服务器写入数据的超时时间
      */
     private int writeTimeout = 10_000;
-
+    /**
+     * 请求头
+     */
     private final Map<String, String> header = new HashMap<>();
 
     public void addHeader(String name, String value) {
@@ -77,12 +88,20 @@ public class CustomRequestConfig {
         this.proxy = proxy;
     }
 
-    public int getMaxRetry() {
-        return maxRetry;
+    public int getRetry() {
+        return retry;
     }
 
-    public void setMaxRetry(int maxRetry) {
-        this.maxRetry = maxRetry;
+    public void setRetry(int retry) {
+        this.retry = retry;
+    }
+
+    public int getConnectTimeout() {
+        return connectTimeout;
+    }
+
+    public void setConnectTimeout(int connectTimeout) {
+        this.connectTimeout = connectTimeout;
     }
 
     public int getReadTimeout() {

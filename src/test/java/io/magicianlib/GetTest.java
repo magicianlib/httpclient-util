@@ -21,7 +21,7 @@ public class GetTest extends TestCase {
         QueryParameter parameter = new QueryParameter();
         parameter.addParameter("q", "中国");
 
-        CustomRequestConfig config = new CustomRequestConfig();
+        RequestConfig config = new RequestConfig();
         config.setProxy("tcp://127.0.0.1:7890");
 
         String s = HttpClientUtil.get("https://www.google.com/search", parameter, config);
@@ -32,8 +32,8 @@ public class GetTest extends TestCase {
         QueryParameter parameter = new QueryParameter();
         parameter.addParameter("q", "中国");
 
-        CustomRequestConfig config = new CustomRequestConfig();
-        config.setMaxRetry(3);
+        RequestConfig config = new RequestConfig();
+        config.setRetry(3);
 
         String s = HttpClientUtil.get("https://www.google.com/search", parameter, config);
         System.out.println("content: \n" + s);

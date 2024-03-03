@@ -1,6 +1,6 @@
 package io.magicianlib.method;
 
-import io.magicianlib.CustomRequestConfig;
+import io.magicianlib.RequestConfig;
 import io.magicianlib.HttpException;
 import io.magicianlib.parameter.MultipartParameter;
 import io.magicianlib.parameter.QueryParameter;
@@ -17,24 +17,24 @@ import java.util.function.Consumer;
 public final class POST {
     private static final Logger LOGGER = LoggerFactory.getLogger(POST.class);
 
-    public static String postText(String url, String text, CustomRequestConfig config) {
+    public static String postText(String url, String text, RequestConfig config) {
         RequestBody body = RequestBody.create(ByteString.encodeString(text, StandardCharsets.UTF_8), MediaType.parse("text/plain"));
         return doPost(url, body, config, request -> LOGGER.info("Http {} Body [{}]", request, text));
     }
 
-    public static String postJson(String url, String json, CustomRequestConfig config) {
+    public static String postJson(String url, String json, RequestConfig config) {
         return doPost(url, RequestBody.create(json, MediaType.parse("application/json; charset=utf-8")), config, request -> LOGGER.info("Http {} Body [{}]", request, json));
     }
 
-    public static String postForm(String url, QueryParameter parameter, CustomRequestConfig config) {
+    public static String postForm(String url, QueryParameter parameter, RequestConfig config) {
         return doPost(url, parameter.toForm(), config, request -> LOGGER.info("Http {} Query [{}]", request, parameter));
     }
 
-    public static String postMultipart(String url, MultipartParameter parameter, CustomRequestConfig config) {
+    public static String postMultipart(String url, MultipartParameter parameter, RequestConfig config) {
         return doPost(url, parameter.toMultipart(), config, request -> LOGGER.info("Http {} Body [Multipart]", request));
     }
 
-    public static String postFile(String url, File file, CustomRequestConfig config) {
+    public static String postFile(String url, File file, RequestConfig config) {
         String fileName = file.getName();
         String type = URLConnection.guessContentTypeFromName(fileName);
         if (type == null) {
@@ -44,7 +44,7 @@ public final class POST {
         return doPost(url, RequestBody.create(file, MediaType.parse(type)), config, request -> LOGGER.info("Http {} Body [File={}]", request, file.getPath()));
     }
 
-    public static String postFile(String url, String fileName, byte[] file, CustomRequestConfig config) {
+    public static String postFile(String url, String fileName, byte[] file, RequestConfig config) {
         String type = URLConnection.guessContentTypeFromName(fileName);
         if (type == null) {
             type = "application/octet-stream"; // 默认二进制流
@@ -53,12 +53,11 @@ public final class POST {
         return doPost(url, RequestBody.create(file, MediaType.parse(type)), config, request -> LOGGER.info("Http {} Body [FileName={}, Data=bytes]", request, fileName));
     }
 
-    public static String doPost(String url, RequestBody body, CustomRequestConfig config, Consumer<Request> printLog) {
+    public static String doPost(String url, RequestBody body, RequestConfig config, Consumer<Request> printLog) {
         Request request = new Request.Builder()
                 .headers(config.toHeaders())
-                .header("Proxy", config.getProxy())
                 .url(url)
-                .tag(CustomRequestConfig.class, config)
+                .tag(RequestConfig.class, config)
                 .post(body)
                 .build();
 
@@ -66,7 +65,7 @@ public final class POST {
             printLog.accept(request);
         }
 
-        Call call = Client.call(request);
+        Call call = Client.call(request, config.getProxy());
         try (Response response = call.execute()) {
             if (response.isSuccessful()) {
                 ResponseBody responseBody = response.body();

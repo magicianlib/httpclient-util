@@ -20,13 +20,11 @@ class Client {
 
     private static final Pattern PROXY_PATTERN = Pattern.compile("^(?<protocol>\\w+):/+(?<hostname>[\\w.]+):(?<port>\\d+)$");
 
-    protected static Call call(Request request) {
-        return selector(request).newCall(request);
+    protected static Call call(Request request, String proxy) {
+        return selector(proxy).newCall(request);
     }
 
-    private static OkHttpClient selector(Request request) {
-        // 如果指定了代理服务器地址则创建一个新的 client
-        String proxy = request.header("Proxy");
+    private static OkHttpClient selector(String proxy) {
         if (proxy == null || proxy.length() == 0) {
             return CLIENT;
         }
